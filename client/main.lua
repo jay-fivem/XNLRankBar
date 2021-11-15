@@ -237,22 +237,20 @@ end)
 -- IT IS NOT TESTED WITH CONTROLLERS! please check or implement controller
 -- combatability yourself since we don't use controllers and neither allow them
 --===================================================================================
-Citizen.CreateThread(function()
+
+RegisterCommand("+showxp", function()
 	if not XNL_EnableZKeyForRankbar then return end
-	while true do
-	Wait(1)
-		if IsControlJustPressed(0, 20) then
-			CurLevel = XNL_GetLevelFromXP(XNL_CurrentPlayerXP)
-			CreateRankBar(XNL_GetXPFloorForLevel(CurLevel), XNL_GetXPCeilingForLevel(CurLevel), XNL_CurrentPlayerXP, XNL_CurrentPlayerXP, CurLevel, false)
+	
+	CurLevel = XNL_GetLevelFromXP(XNL_CurrentPlayerXP)
+	CreateRankBar(XNL_GetXPFloorForLevel(CurLevel), XNL_GetXPCeilingForLevel(CurLevel), XNL_CurrentPlayerXP, XNL_CurrentPlayerXP, CurLevel, false)
 
-			-- ShowHudComponentThisFrame(3) -- Enable this line if you want to display the native player CASH
-			--ShowHudComponentThisFrame(4) -- Enable this line if you want to display the native player BANK amount
-			-- NOTE ON THE TWO ABOVE: Those are NOT implemented in this script! but just as 'extra info' for a 'complete hud'
-			print(CurLevel)
-		end
-	end
-end)
-
+	-- ShowHudComponentThisFrame(3) -- Enable this line if you want to display the native player CASH
+	--ShowHudComponentThisFrame(4) -- Enable this line if you want to display the native player BANK amount
+	-- NOTE ON THE TWO ABOVE: Those are NOT implemented in this script! but just as 'extra info' for a 'complete hud'
+	print(CurLevel)
+	
+end, false)
+RegisterKeyMapping('+showxp', 'Show XP', 'keyboard', 'Z')
 
 --===================================================================================
 -- Export Functions so they can more easily be called from external scripts :)
