@@ -147,6 +147,8 @@ local RockstarRanks = {
 893600, 916000, 938700, 961600, 984700, 1008100, 1031800, 1055700, 1079800, 1104200, 1128800, 1153700, 1178800, 1204200, 1229800, 1255600,
 1281700, 1308100, 1334600, 1361400, 1388500, 1415800, 1443300, 1471100, 1499100, 1527300, 1555800, 1584350}
 
+QBCore = exports['qb-core']:GetCoreObject()
+
 function tablePrintOut(table)
     if type(table) == 'table' then
        local s = '\n{ '
@@ -179,14 +181,21 @@ XNL_EnableZKeyForRankbar = true		-- This Enables/Disables (when you set it to fa
 -- in the Rank Bar
 --===================================================================================
 XNL_CurrentPlayerXP = 0
+XNL_driving = 0
+XNL_crafting = 0
+
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
 AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
 	
-	local player = QBCore.Functions.GetPlayerData()
+	local player = QBCore.Functions.GetPlayerData().citizenid
 	-- print(tablePrintOut(player))
-	
-	TriggerServerEvent('xnlrankbar:server:getxp',player)
+	QBCore.Functions.TriggerCallback('xnlrankbar:server:getxpcb', function(experience)
+		XNL_CurrentPlayerXP = experience.driving
+		XNL_crafting = experience.crafting
+	end)
+	print(XNL_driving , XNL_crafting)
+	-- TriggerServerEvent('xnlrankbar:server:getxp',player)
 end)
 
 --===================================================================================
@@ -239,6 +248,7 @@ Citizen.CreateThread(function()
 			-- ShowHudComponentThisFrame(3) -- Enable this line if you want to display the native player CASH
 			--ShowHudComponentThisFrame(4) -- Enable this line if you want to display the native player BANK amount
 			-- NOTE ON THE TWO ABOVE: Those are NOT implemented in this script! but just as 'extra info' for a 'complete hud'
+			print(CurLevel)
 		end
 	end
 end)
@@ -251,7 +261,6 @@ end)
 --===================================================================================
 exports('Exp_XNL_SetInitialXPLevels', function(EXCurrentXP, EXShowRankBar, EXShowRankBarAnimating)
 	XNL_SetInitialXPLevels(EXCurrentXP, EXShowRankBar, EXShowRankBarAnimating)
-	print("TEST")
 end)
 
 exports('Exp_XNL_AddPlayerXP', function(EXXPAmount)
@@ -374,8 +383,7 @@ function XNL_OnPlayerLevelsLost()
 end
 
 function XNL_AddPlayerXP(XPAmount)
-	-- src = source
-	-- xplayer = QBCore.Functions.GetPlayer(src)
+	xplayer = QBCore.Functions.GetPlayerData().citizenid
 	--======================================================================================
 	-- "The Command" to give the player new XP (Well documented/commented)
 	--======================================================================================
@@ -395,14 +403,14 @@ function XNL_AddPlayerXP(XPAmount)
 		return
 	end
 	
-	-- print("test")
-	-- TriggerServerEvent('xnlrankbar:server:setxp', XPAmount,src)
+	
 
 	local CurrentLevel = XNL_GetLevelFromXP(XNL_CurrentPlayerXP)	-- Remembers the CURRENT level of the player BEFORE adding the new XP
 	local CurrentXPWithAddedXP = XNL_CurrentPlayerXP + XPAmount		-- Remembers the NEW XP amount (with the new xp added to the already 'owned XP')
 	local NewLevel =  XNL_GetLevelFromXP(CurrentXPWithAddedXP)		-- Remembers the NEW level which the player will get after adding the new XP (IF there would be a new level)
-	local LevelDifference = 0										-- This variable will 'later on' remember how many levels the player has leveled up (at once)
-	
+	local LevelDifference = 0			
+								-- This variable will 'later on' remember how many levels the player has leveled up (at once)
+	TriggerServerEvent('xnlrankbar:server:setxp', CurrentXPWithAddedXP,xplayer)
 	-- This section is 'my build in level cap' which can be set in the variables at the top of the script
 	if NewLevel > XNL_MaxPlayerLevel - 1 then
 		NewLevel = XNL_MaxPlayerLevel -1

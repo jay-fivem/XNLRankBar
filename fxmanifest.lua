@@ -4,10 +4,6 @@ game 'gta5'
 description 'XNLRANKBAR xp system'
 version '1.0.0'
 
-shared_scripts {
-	'@qb-core/import.lua',
-}
-
 client_scripts {
     'client/main.lua'
 }
